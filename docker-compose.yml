@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+    depends_on:
+      - mlflow
+      - elasticsearch
+    volumes:
+      - ./models:/app/models
+    networks:
+      - mlops-network
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.8.1
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://localhost:5000
+    volumes:
+      - mlflow-data:/mlflow
+    networks:
+      - mlops-network
+    command: mlflow server --host 0.0.0.0
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - mlops-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.3
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - mlops-network
+
+volumes:
+  mlflow-data:
+  elasticsearch-data:
+
+networks:
+  mlops-network:
+    driver: bridge

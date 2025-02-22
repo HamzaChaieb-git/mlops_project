@@ -1,0 +1,55 @@
+# config/logging_config.yaml
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  standard:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  error:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(filename)s:%(lineno)d'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: standard
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.FileHandler
+    level: INFO
+    formatter: standard
+    filename: logs/app.log
+    mode: a
+
+  error_file:
+    class: logging.FileHandler
+    level: ERROR
+    formatter: error
+    filename: logs/error.log
+    mode: a
+
+loggers:
+  src:
+    level: INFO
+    handlers: [console, file, error_file]
+    propagate: false
+
+  src.api:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+
+  src.models:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+
+  src.data:
+    level: INFO
+    handlers: [console, file]
+    propagate: false
+
+root:
+  level: INFO
+  handlers: [console]

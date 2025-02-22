@@ -1,0 +1,10 @@
+# pytest.ini
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+markers =
+    integration: mark test as an integration test
+    unit: mark test as a unit test
+addopts = -v --cov=src --cov-report=html --cov-report=xml
